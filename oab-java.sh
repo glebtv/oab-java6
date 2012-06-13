@@ -173,7 +173,6 @@ function copyright_msg() {
         echo "========"                
     fi    
     echo `basename ${0}`" v${VER} - Create a local 'apt' repository for Sun Java 6 and/or Oracle Java 7 packages."
-    echo
     echo "Copyright (c) Martin Wimpress, http://flexion.org. MIT License"
 	echo
 	echo "By running this script to download Java you acknowledge that you have"
@@ -267,9 +266,8 @@ function usage() {
     echo "  sudo apt-get install sun-java6-jre"
     echo
     echo "Or if you ran the script with the ``-7`` option."
-    echo "::"
     echo
-    echo "  sudo apt-get install oracle-java7-jre"
+    echo "  sudo apt-get install oracle-java7-jre"            
     echo
     echo "If you already have the *\"official\"* Ubuntu packages installed then you"
     echo "can upgrade by executing the following from a shell."
@@ -437,9 +435,10 @@ pid=$!;progress $pid
 # See if the Java version is on the download frontpage, otherwise look for it in
 # the previous releases page.
 DOWNLOAD_INDEX=`grep -P -o "/technetwork/java/javase/downloads/jdk-${JAVA_VER}u${JAVA_UPD}-downloads-\d+\.html" /tmp/oab-index.html | uniq`
-if [ -n "${DOWNLOAD_INDEX}" ]; then
+if [ "1" ]; then
     ncecho " [x] Getting current release download page "
-    wget http://www.oracle.com/${DOWNLOAD_INDEX} -O /tmp/oab-download.html >> "$log" 2>&1 &
+    # wget http://www.oracle.com/${DOWNLOAD_INDEX} -O /tmp/oab-download.html >> "$log" 2>&1 &
+    wget http://www.oracle.com/technetwork/java/javase/downloads/jdk6-downloads-1637591.html  -O /tmp/oab-download.html >> "$log" 2>&1 & 
     pid=$!;progress $pid
 else
     ncecho " [x] Getting previous releases download page "
@@ -474,6 +473,8 @@ do
     ln -s ${WORK_PATH}/pkg/${JAVA_BIN} ${WORK_PATH}/src/${JAVA_BIN} >> "$log" 2>&1 &
     pid=$!;progress_loop $pid    
 done
+
+wget --no-check-certificate --header="Cookie: ${COOKIES}" -c "http://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip" -O ${WORK_PATH}/src/jce_policy-6.zip >> "$log" 2>&1 &
 
 # Determine the new version
 NEW_VERSION="${DEB_VERSION}~${LSB_CODE}1"
